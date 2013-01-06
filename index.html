@@ -5,26 +5,8 @@
     <link type="text/css" href="css/style.css" rel=stylesheet>
     <script type="text/javascript" src="jquery/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="js/expression.js"></script>
-    <script type="text/javascript">
-
-
-        var printOut = function (str) { $("#out").html(str); };
-
-        function runParser () {
-            var source = $("#source").val();
-            try {
-                $("#out").removeClass("bad").addClass('good');
-                printOut(JSON.stringify(expression.parse(source)));
-            } catch(e) {
-                $("#out").removeClass("good").addClass('bad');
-                printOut(e.message || e);
-            }
-        }
-
-        $(document).ready(function () {
-            $("#parse_btn").on("click",runParser);
-        });
-    </script>
+    <script type="text/javascript" src="js/compile.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 </head>
 <body>
 
@@ -32,10 +14,11 @@
 
         <div id="parsing">
             <h2>Test Your Parser</h2>
-            <textarea style="width:1000px;height:60px" id="source">5*PI^2</textarea><br>
+            <textarea style="width:1000px;height:60px" id="source">1==2</textarea><br>
             <button id="parse_btn">Parse</button>
         </div>
-        <pre id="out"></pre>
+        <pre id="astsOut"></pre>
+        <pre id="evaluationOut"></pre>
     </div>
 </body>
 </html>
