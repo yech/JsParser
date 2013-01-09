@@ -61,7 +61,7 @@ textarea {
 #content h2 {
     background: #41a3c2;
     color: white;
-    text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
     padding: 4px 10px;
     margin-top: 2em;
 
@@ -75,7 +75,7 @@ textarea {
 }
 
 
-a img { border: 0px; }
+a img { border: 0; }
 
 #try textarea {
     width: 100%;
@@ -86,7 +86,7 @@ a img { border: 0px; }
     -moz-border-radius: 8px;
     background-color: #eee;
 }
-#intro p { margin: 1em 1em; padding: 1em 0em; }
+#intro p { margin: 1em 1em; padding: 1em 0; }
 
 #table table, #productions li, #nonterminals dl {
     font-family: monospace;
@@ -98,7 +98,7 @@ a img { border: 0px; }
 }
 #loading {
     position: fixed;
-    top: 0px;
+    top: 0;
     right: 100px;
     z-index: 10;
     width: 16px;
@@ -140,13 +140,13 @@ table tr:hover td {
 #table table {
     border: 1px #6699CC solid;
     border-collapse: collapse;
-    border-spacing: 0px;
+    border-spacing: 0;
 }
 #table table tr td, #table table th { padding: 3px; }
 
 
 #try button {
-    font-size: 1.5em;
+    font-size: 1em;
 }
 
 .good {
