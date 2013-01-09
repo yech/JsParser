@@ -1,4 +1,3 @@
-
 /* description: Parses end executes logic expressions. */
 
 /* lexical grammar */
@@ -6,36 +5,36 @@
 %x mu b m
 %%
 
-<INITIAL,b,m>[.]*?/"$"					{ this.begin("mu"); }
+<INITIAL,b,m>[.]*?/"$"						{ this.begin("mu"); }
 <INITIAL,b,m>\s+						/* skip whitespace */
-<INITIAL,b,m>[0-9]+("."[0-9]+)?\b		{ return 'NUMBER'; }
-[%\+\-\*/]								{ return yytext; }
-"<="									{ return yytext; }
-">="									{ return yytext; }
-[><]									{ return yytext; }
-"=="									{ return yytext; }
-"||"									{ return yytext; }
-"&&"									{ return yytext; }
-"!="									{ return yytext; }
-"!"										{ return yytext; }
-"="										{ return 'EQUAL'; }
-"("										{ return 'PARENTHESIS'; }
-")"										{ return 'CLOSE_PARENTHESIS'; }
+<INITIAL,b,m>[0-9]+("."[0-9]+)?\b				{ return 'NUMBER'; }
+[%\+\-\*/]							{ return yytext; }
+"<="								{ return yytext; }
+">="								{ return yytext; }
+[><]								{ return yytext; }
+"=="								{ return yytext; }
+"||"								{ return yytext; }
+"&&"								{ return yytext; }
+"!="								{ return yytext; }
+"!"								{ return yytext; }
+"="								{ return 'EQUAL'; }
+"("								{ return 'PARENTHESIS'; }
+")"								{ return 'CLOSE_PARENTHESIS'; }
 <INITIAL,b,m>"null"						{ return 'BOOL'; }
-<INITIAL,b,m>"false"					{ return 'BOOL'; }
+<INITIAL,b,m>"false"						{ return 'BOOL'; }
 <INITIAL,b,m>"true"						{ return 'BOOL'; }
-<INITIAL,b,m>"'"(\\\'|[^\'])*"'"		{ yytext = yytext.substr(1, yyleng-2).replace(/\\'/g,"'"); return 'STRING'; }
+<INITIAL,b,m>"'"(\\\'|[^\'])*"'"				{ yytext = yytext.substr(1, yyleng-2).replace(/\\'/g,"'"); return 'STRING'; }
 <mu>"$"/[{a-zA-Z_]						{ return 'DOLLAR'; }
-<mu>[_a-zA-Z][a-zA-Z0-9_]*				{ return 'ID'; }
-<mu>"."									{ return 'DOT'; }
+<mu>[_a-zA-Z][a-zA-Z0-9_]*					{ return 'ID'; }
+<mu>"."								{ return 'DOT'; }
 <mu,m>","[ ]*							{ return 'COMMA'; }
-<mu,b,m>"["								{ this.begin("b"); return 'BRACKET'; }
-<b>"]"									{ this.popState(); return 'CLOSE_BRACKET'; }
-<mu>"("									{ this.begin("m"); return 'PARENTHESIS'; }
-<m>")"									{ this.popState(); return 'CLOSE_PARENTHESIS'; }
-<mu>\s+									{ this.popState(); }
-<mu>/.									{ this.popState(); }
-<mu><<EOF>>								{ this.popState(); return 'EOF'; }
+<mu,b,m>"["							{ this.begin("b"); return 'BRACKET'; }
+<b>"]"								{ this.popState(); return 'CLOSE_BRACKET'; }
+<mu>"("								{ this.begin("m"); return 'PARENTHESIS'; }
+<m>")"								{ this.popState(); return 'CLOSE_PARENTHESIS'; }
+<mu>\s+								{ this.popState(); }
+<mu>/.								{ this.popState(); }
+<mu><<EOF>>							{ this.popState(); return 'EOF'; }
 <INITIAL><<EOF>>						{ return 'EOF'; }
 
 /lex
@@ -64,7 +63,7 @@ expression
         { $$ = {type: 'expression', expression: [$1, $3], operator: $2 }; }
     | '!' expression
         { $$ = {type: 'expression', expression: [$2], operator: 'not' }; }
-	| expression '>' expression
+    | expression '>' expression
         { $$ = {type: 'expression', expression: [$1, $3], operator: $2 }; }
     | expression '<' expression
         { $$ = {type: 'expression', expression: [$1, $3], operator: $2 }; }
@@ -90,8 +89,8 @@ expression
         { $$ = $1; }
     | parenthesis
         { $$ = $1; }
-	| references
-		{ $$ = $1; }
+    | references
+	{ $$ = $1; }
     | '-' parenthesis
         { $$ = {type: 'expression', expression: [$2], operator: 'minus' }; }
     ;
