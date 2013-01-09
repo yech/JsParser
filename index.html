@@ -10,15 +10,19 @@
 </head>
 <body>
 
-    <div id="try">
+<div id="try">
 
-        <div id="parsing">
-            <h2>Test Your Parser</h2>
-            <textarea style="width:1000px;height:60px" id="source">1==2</textarea><br>
-            <button id="parse_btn">Parse</button>
+    <div id="parsing">
+        <h2>Test Your Parser</h2>
+
+            <label for="source">source:</label><br><textarea style="width:600px;height:60px" id="source">1==2</textarea><br>
+            <label for="context">context:</label><br><textarea style="width:600px;height:60px" id="context">1==2</textarea>
+
         </div>
-        <pre id="astsOut"></pre>
-        <pre id="evaluationOut"></pre>
-    </div>
+        <button id="parse_btn">Parse</button>
+
+    <pre id="astsOut"></pre>
+    <pre id="evaluationOut"></pre>
+</div>
 </body>
 </html>
