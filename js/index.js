@@ -10,7 +10,9 @@ var runParser = function() {
             var asts = expression.parse(source);
             printOut(JSON.stringify(asts));
             var compile = new Compile(asts);
-            $("#evaluationOut").text(compile.evaluate({}));
+            var context = $.parseJSON($("#context").val());
+
+            $("#evaluationOut").text(compile.evaluate(context));
         }
     } catch (e) {
         $out.removeClass("good").addClass('bad');
