@@ -14,12 +14,25 @@ a:hover {
     color: #000;
 }
 
-pre {
+div#astsOut,div#evaluationOut {
     background-color: #eee;
-    padding: 1em;
+    padding: 6px;
     -moz-border-radius: 1em;
     -webkit-border-radius: 1em;
+    line-height: 22px;
+    margin-top:10px;
 }
+
+div#astsOut.good,div#evaluationOut.good {
+    background: #efe;
+    border: 2px solid green;
+}
+
+div#astsOut.bad,div#evaluationOut.bad {
+    background: #fee;
+    border: 2px solid red;
+}
+
 
 #header, #main, #content {
     max-width: 600px;
@@ -149,12 +162,3 @@ table tr:hover td {
     font-size: 1em;
 }
 
-.good {
-    background: #efe;
-    border: 2px solid green;
-}
-
-.bad {
-    background: #fee;
-    border: 2px solid red;
-}

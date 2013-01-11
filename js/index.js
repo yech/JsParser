@@ -1,5 +1,6 @@
 var runParser = function() {
     var $out = $("#astsOut");
+    var $evalOut = $("#evaluationOut");
     var printOut = function (str) {
         $out.html(str);
     };
@@ -12,10 +13,12 @@ var runParser = function() {
             var compile = new Compile(asts);
             var context = $.parseJSON($("#context").val());
 
-            $("#evaluationOut").text(compile.evaluate(context));
+            $evalOut.removeClass("bad").addClass('good');
+            $evalOut.text(compile.evaluate(context));
         }
     } catch (e) {
         $out.removeClass("good").addClass('bad');
+        $evalOut.removeClass("good").addClass('bad');
         printOut(e.message || e);
     }
 };
