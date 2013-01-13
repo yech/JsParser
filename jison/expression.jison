@@ -2,39 +2,40 @@
 
 /* lexical grammar */
 %lex
-%x mu b m
+%x ref b p func
 %%
 
-<INITIAL,b,m>[.]*?/"$"                                { this.begin("mu"); }
-<INITIAL,b,m>\s+                                      /* skip whitespace */
-<INITIAL,b,m>[0-9]+("."[0-9]+)?\b                     { return 'NUMBER'; }
-[%\+\-\*/]                                            { return yytext; }
-"<="                                                  { return yytext; }
-">="                                                  { return yytext; }
-[><]                                                  { return yytext; }
-"=="                                                  { return yytext; }
-"||"                                                  { return yytext; }
-"&&"                                                  { return yytext; }
-"!="                                                  { return yytext; }
-"!"                                                   { return yytext; }
-"="                                                   { return 'EQUAL'; }
-"("                                                   { return 'PARENTHESIS'; }
-")"                                                   { return 'CLOSE_PARENTHESIS'; }
-<INITIAL,b,m>"null"                                   { return 'BOOL'; }
-<INITIAL,b,m>"false"                                  { return 'BOOL'; }
-<INITIAL,b,m>"true"                                   { return 'BOOL'; }
-<INITIAL,b,m>"'"(\\\'|[^\'])*"'"                      { yytext = yytext.substr(1, yyleng-2).replace(/\\'/g,"'"); return 'STRING'; }
-<mu>"$"/[{a-zA-Z_]                                    { return 'DOLLAR'; }
-<mu>[_a-zA-Z][a-zA-Z0-9_]*                            { return 'ID'; }
-<mu>"."                                               { return 'DOT'; }
-<mu,m>","[ ]*                                         { return 'COMMA'; }
-<mu,b,m>"["                                           { this.begin("b"); return 'BRACKET'; }
+<INITIAL,b,p,func>[.]*?/"$"                           { this.begin("ref"); }
+[a-zA-Z][a-zA-Z_]*?/"("                               { this.begin("func"); return 'ID'; }
+<INITIAL,b,p,func>\s+                                 /* skip whitespace */
+<INITIAL,b,p,func>[0-9]+("."[0-9]+)?\b                { return 'NUMBER'; }
+<INITIAL,ref,b,p,func>[%\+\-\*/]                      { return yytext; }
+<INITIAL,p,func>"<="                                  { return yytext; }
+<INITIAL,p,func>">="                                  { return yytext; }
+<INITIAL,p,func>[><]                                  { return yytext; }
+<INITIAL,p,func>"=="                                  { return yytext; }
+<INITIAL,p,func>"||"                                  { return yytext; }
+<INITIAL,p,func>"&&"                                  { return yytext; }
+<INITIAL,p,func>"!="                                  { return yytext; }
+<INITIAL,p,func>"!"                                   { return yytext; }
+<INITIAL,p,func>"="                                   { return 'EQUAL'; }
+<INITIAL,p,func>"null"                                { return 'BOOL'; }
+<INITIAL,p,func>"false"                               { return 'BOOL'; }
+<INITIAL,p,func>"true"                                { return 'BOOL'; }
+<INITIAL,b,p,func>"'"(\\\'|[^\'])*"'"                 { yytext = yytext.substr(1, yyleng-2).replace(/\\'/g,"'"); return 'STRING'; }
+<ref>"$"/[{a-zA-Z_]                                   { return 'DOLLAR'; }
+<ref>[_a-zA-Z][a-zA-Z0-9_]*                           { return 'ID'; }
+<ref>"."                                              { return 'DOT'; }
+<ref,p,func>","[ ]*                                   { return 'COMMA'; }
+<ref,b,p>"["                                          { this.begin("b"); return 'BRACKET'; }
 <b>"]"                                                { this.popState(); return 'CLOSE_BRACKET'; }
-<mu>"("                                               { this.begin("m"); return 'PARENTHESIS'; }
-<m>")"                                                { this.popState(); return 'CLOSE_PARENTHESIS'; }
-<mu>\s+                                               { this.popState(); }
-<mu>/.                                                { this.popState(); }
-<mu><<EOF>>                                           { this.popState(); return 'EOF'; }
+<INITIAL,b,func>"("                                   { return 'PARENTHESIS'; }
+<INITIAL,b>")"                                        { return 'CLOSE_PARENTHESIS'; }
+<ref,p>"("                                            { this.begin("p"); return 'PARENTHESIS'; }
+<p,func>")"                                           { this.popState(); return 'CLOSE_PARENTHESIS'; }
+<ref>\s+                                              { this.popState(); }
+<ref>/.                                               { this.popState(); }
+<ref,func><<EOF>>                                     { this.popState(); return 'EOF'; }
 <INITIAL><<EOF>>                                      { return 'EOF'; }
 
 /lex
@@ -91,6 +92,8 @@ expression
         { $$ = $1; }
     | references
         { $$ = $1; }
+    | functionCall
+        { $$ = {type: 'functionCall', id: $1.id, args: $1.args }; }
     | '-' parenthesis
         { $$ = {type: 'expression', expression: [$2], operator: 'minus' }; }
     ;
@@ -128,9 +131,9 @@ bool
 
 references
     : DOLLAR ID attributes
-        { $$ = {type: "references", id: $2, path: $3}; }
+        { $$ = {type: 'references', id: $2, path: $3}; }
     | DOLLAR ID
-        { $$ = {type: "references", id: $2}; }
+        { $$ = {type: 'references', id: $2}; }
     ;
 
 attributes
@@ -142,25 +145,25 @@ attributes
 
 attribute
     : method
-        { $$ = {type:"method", id: $1.id, args: $1.args }; }
+        { $$ = {type: 'method', id: $1.id, args: $1.args }; }
     | index
-        { $$ = {type: "index", id: $1 }; }
+        { $$ = {type: 'index', id: $1 }; }
     | property
-        { $$ = {type: "property", id: $1 };}
+        { $$ = {type: 'property', id: $1 };}
     ;
 
 method
-    : DOT methodbd
+    : DOT functionCall
         { $$ = $2; }
     ;
 
-methodbd
+functionCall
     : ID PARENTHESIS params CLOSE_PARENTHESIS
         { $$ = {id: $1, args: $3 }; }
     | ID PARENTHESIS CLOSE_PARENTHESIS
         { $$ = {id: $1, args: undefined }; }
     ;
-
+/*
 params
     : literal
         { $$ = [$1]; }
@@ -169,6 +172,13 @@ params
     | params COMMA literal
         { $$ = [].concat($1, $3); }
     | params COMMA references
+        { $$ = [].concat($1, $3); }
+    ;
+*/
+params
+    : expression
+        { $$ = [$1]; }
+    | params COMMA expression
         { $$ = [].concat($1, $3); }
     ;
 

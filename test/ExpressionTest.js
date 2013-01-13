@@ -243,9 +243,15 @@ describe("test expression", function () {
             });
             it("test method",function(){
                 expect(new Compile(expression.parse("$a.fn()")).evaluate({a:{a:1,b:2,fn:function(){return this.a+this.b}}})).toEqual(3);
+                expect(new Compile(expression.parse("$a.fn('a')")).evaluate({a:{a:'1',b:'2',fn:function(arg){return this.a+this.b+arg}}})).toEqual('12a');
                 expect(new Compile(expression.parse("$a.fn(1,2,3)")).evaluate({a:{a:1,b:2,fn:function(p1,p2,p3){return p1+p2+p3}}})).toEqual(6);
-                expect(new Compile(expression.parse("$a.fn($b)")).evaluate({a:{a:1,fn:function(p1){return p1+1}},b:4})).toEqual(5);
+                expect(new Compile(expression.parse("$a.fn($a.b>1)")).evaluate({a:{a:1,b:2,fn:function(arg){return arg}}})).toBeTruthy();
+                expect(new Compile(expression.parse("$a.fn($a.b>1 && ($a.a==1) || (true && false))")).evaluate({a:{a:1,b:2,fn:function(arg){return arg}}})).toBeTruthy();
+                expect(new Compile(expression.parse("$a.fn($b+1)+1")).evaluate({a:{a:1,fn:function(p1){return p1+1}},b:4})).toEqual(7);
+                expect(new Compile(expression.parse("$a.fn($b+1)==6")).evaluate({a:{a:1,fn:function(p1){return p1+1}},b:4})).toBeTruthy();
                 expect(new Compile(expression.parse("$a.fn($a.b)")).evaluate({a:{a:1,b:2,fn:function(p1){return p1+1}},b:4})).toEqual(3);
+                expect(new Compile(expression.parse("$a+a(1)"),{a:function(p){return p+1}}).evaluate({a:4})).toEqual(6);
+                expect(new Compile(expression.parse("a(1)+b(1,2,$a+1,$b)"),{a:function(p){return p+1},b:function(p1,p2,p3,p4){return p1+p2+p3+p4;}}).evaluate({a:4,b:1})).toEqual(11);
             });
         });
 
@@ -259,6 +265,7 @@ describe("test expression", function () {
             expect(new Compile(expression.parse("$a[$c]+$b[$d][$e]")).getReferenceNameArray()).toEqual(["a","c","b","d","e"]);
             expect(new Compile(expression.parse("$a.c+$b")).getReferenceNameArray()).toEqual(["a","b"]);
             expect(new Compile(expression.parse("$a.abc($c,$d)+$b")).getReferenceNameArray()).toEqual(["a","c","d","b"]);
+            expect(new Compile(expression.parse("sum($a,$b)+$c-$d.ff($f)")).getReferenceNameArray()).toEqual(["a","b","c","d","f"]);
         });
     });
 

@@ -1,5 +1,6 @@
-var Compile = function (asts) {
+var Compile = function (asts, functions) {
     this.asts = asts;
+    this.functions = functions || {};
 };
 
 Compile.prototype = {
@@ -15,8 +16,8 @@ Compile.prototype = {
         this.references = {};
         this.getRef(this.asts);
         var ret = [];
-        for(var key in this.references){
-            if(this.references.hasOwnProperty(key)){
+        for (var key in this.references) {
+            if (this.references.hasOwnProperty(key)) {
                 ret.push(key);
             }
         }
@@ -51,30 +52,34 @@ Compile.prototype = {
                     break;
                 default:
             }
-        } else {
-            if (type === 'references') {
-                if (this.references[ast.id] === undefined) {
-                    this.references[ast.id] = null;
-                }
-                if (ast.path !== undefined) {
-                    for (var i = 0; i < ast.path.length; i++) {
-                        var property = ast.path[i];
-                        if(property.type==='index'){
-                            var indexAst = property.id;
-                            if (indexAst.type === 'references') {
-                                this.getRef(indexAst);
-                            }
-                        } else if (property.type === 'method') {
-                            if (property.args !== undefined) {
-                                for (var argIndex = 0; argIndex < property.args.length; argIndex++) {
-                                    var arg = property.args[argIndex];
-                                    if(arg.type === 'references'){
-                                        this.getRef(arg);
-                                    }
+        } else if (type === 'references') {
+            if (this.references[ast.id] === undefined) {
+                this.references[ast.id] = null;
+            }
+            if (ast.path !== undefined) {
+                for (var i = 0; i < ast.path.length; i++) {
+                    var property = ast.path[i];
+                    if (property.type === 'index') {
+                        var indexAst = property.id;
+                        if (indexAst.type === 'references') {
+                            this.getRef(indexAst);
+                        }
+                    } else if (property.type === 'method') {
+                        if (property.args !== undefined) {
+                            for (var argIndex = 0; argIndex < property.args.length; argIndex++) {
+                                var arg = property.args[argIndex];
+                                if (arg.type === 'references') {
+                                    this.getRef(arg);
                                 }
                             }
                         }
                     }
+                }
+            }
+        } else if (type === 'functionCall') {
+            if (ast.args !== undefined) {
+                for (var j = 0; j < ast.args.length; j++) {
+                    this.getRef(ast.args[j]);
                 }
             }
         }
@@ -83,80 +88,106 @@ Compile.prototype = {
     getExpression:function (ast) {
         var exp = ast.expression;
         var ret;
-        if (ast.type === 'expression') {
+        switch (ast.type) {
+            case 'expression':
+                switch (ast.operator) {
+                    case '+':
+                        ret = this.getExpression(exp[0]) + this.getExpression(exp[1]);
+                        break;
 
-            switch (ast.operator) {
-                case '+':
-                    ret = this.getExpression(exp[0]) + this.getExpression(exp[1]);
-                    break;
+                    case '-':
+                        ret = this.getExpression(exp[0]) - this.getExpression(exp[1]);
+                        break;
 
-                case '-':
-                    ret = this.getExpression(exp[0]) - this.getExpression(exp[1]);
-                    break;
+                    case '/':
+                        ret = this.getExpression(exp[0]) / this.getExpression(exp[1]);
+                        break;
 
-                case '/':
-                    ret = this.getExpression(exp[0]) / this.getExpression(exp[1]);
-                    break;
+                    case '%':
+                        ret = this.getExpression(exp[0]) % this.getExpression(exp[1]);
+                        break;
 
-                case '%':
-                    ret = this.getExpression(exp[0]) % this.getExpression(exp[1]);
-                    break;
+                    case '*':
+                        ret = this.getExpression(exp[0]) * this.getExpression(exp[1]);
+                        break;
 
-                case '*':
-                    ret = this.getExpression(exp[0]) * this.getExpression(exp[1]);
-                    break;
+                    case '||':
+                        ret = this.getExpression(exp[0]) || this.getExpression(exp[1]);
+                        break;
 
-                case '||':
-                    ret = this.getExpression(exp[0]) || this.getExpression(exp[1]);
-                    break;
+                    case '&&':
+                        ret = this.getExpression(exp[0]) && this.getExpression(exp[1]);
+                        break;
 
-                case '&&':
-                    ret = this.getExpression(exp[0]) && this.getExpression(exp[1]);
-                    break;
+                    case '>':
+                        ret = this.getExpression(exp[0]) > this.getExpression(exp[1]);
+                        break;
 
-                case '>':
-                    ret = this.getExpression(exp[0]) > this.getExpression(exp[1]);
-                    break;
+                    case '<':
+                        ret = this.getExpression(exp[0]) < this.getExpression(exp[1]);
+                        break;
 
-                case '<':
-                    ret = this.getExpression(exp[0]) < this.getExpression(exp[1]);
-                    break;
+                    case '==':
+                        ret = this.getExpression(exp[0]) == this.getExpression(exp[1]);
+                        break;
 
-                case '==':
-                    ret = this.getExpression(exp[0]) == this.getExpression(exp[1]);
-                    break;
+                    case '>=':
+                        ret = this.getExpression(exp[0]) >= this.getExpression(exp[1]);
+                        break;
 
-                case '>=':
-                    ret = this.getExpression(exp[0]) >= this.getExpression(exp[1]);
-                    break;
+                    case '<=':
+                        ret = this.getExpression(exp[0]) <= this.getExpression(exp[1]);
+                        break;
 
-                case '<=':
-                    ret = this.getExpression(exp[0]) <= this.getExpression(exp[1]);
-                    break;
+                    case '!=':
+                        ret = this.getExpression(exp[0]) != this.getExpression(exp[1]);
+                        break;
 
-                case '!=':
-                    ret = this.getExpression(exp[0]) != this.getExpression(exp[1]);
-                    break;
+                    case 'minus':
+                        ret = -this.getExpression(exp[0]);
+                        break;
 
-                case 'minus':
-                    ret = -this.getExpression(exp[0]);
-                    break;
+                    case 'not':
+                        ret = !this.getExpression(exp[0]);
+                        break;
 
-                case 'not':
-                    ret = !this.getExpression(exp[0]);
-                    break;
+                    case 'parenthesis':
+                        ret = this.getExpression(exp[0]);
+                        break;
 
-                case 'parenthesis':
-                    ret = this.getExpression(exp[0]);
-                    break;
+                    default:
+                        return undefined;
+                }
 
-                default:
-                    return undefined;
-            }
+                return ret;
+                break;
+            case 'string':
+                return ast.value;
+                break;
+            case 'number':
+                return Number(ast.value);
+                break;
+            case 'bool':
+                if (ast.value === "null") {
+                    return null;
+                } else {
+                    return (ast.value === 'true');
+                }
+                break;
+            case 'references':
+                return this.getReferences(ast);
+                break;
+            case 'functionCall':
+                return this.getFunctionCall(ast);
+                break;
+            default:
+                return undefined;
+            //return this.getLiteral(ast);
+            /*
 
-            return ret;
-        } else {
-            return this.getLiteral(ast);
+             case 'reference':
+             return this.getReferences(ast);
+             */
         }
     },
 
@@ -214,6 +245,21 @@ Compile.prototype = {
         return ret;
     },
 
+    getFunctionCall:function (ast) {
+        var func = this.functions[ast.id];
+        var args = [];
+
+        if (ast.args !== undefined) {
+            for (var i = 0; i < ast.args.length; i++) {
+                args.push(this.getExpression(ast.args[i]));
+            }
+        }
+
+        if (func && func.call) {
+            return func.apply(this.context, args);
+        }
+        return undefined;
+    },
 
     getPropMethod:function (property, baseRef) {
 
@@ -223,7 +269,8 @@ Compile.prototype = {
 
         if (property.args !== undefined) {
             for (var i = 0; i < property.args.length; i++) {
-                args.push(this.getLiteral(property.args[i]));
+                //args.push(this.getLiteral(property.args[i]));
+                args.push(this.getExpression(property.args[i]));
             }
         }
 
@@ -251,4 +298,5 @@ Compile.prototype = {
 
         return ret;
     }
-};
+}
+;
