@@ -14,7 +14,7 @@ a:hover {
     color: #000;
 }
 
-div#astsOut,div#evaluationOut {
+div#astsOut,div#evaluationOut,div#refOut {
     background-color: #eee;
     padding: 6px;
     -moz-border-radius: 1em;
@@ -23,12 +23,12 @@ div#astsOut,div#evaluationOut {
     margin-top:10px;
 }
 
-div#astsOut.good,div#evaluationOut.good {
+div#astsOut.good,div#evaluationOut.good,div#refOut.good {
     background: #efe;
     border: 2px solid green;
 }
 
-div#astsOut.bad,div#evaluationOut.bad {
+div#astsOut.bad,div#evaluationOut.bad,div#refOut.bad {
     background: #fee;
     border: 2px solid red;
 }
