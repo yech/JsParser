@@ -90,7 +90,7 @@ expression
     | parenthesis
         { $$ = $1; }
     | references
-	{ $$ = $1; }
+        { $$ = $1; }
     | '-' parenthesis
         { $$ = {type: 'expression', expression: [$2], operator: 'minus' }; }
     ;
