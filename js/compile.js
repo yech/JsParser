@@ -11,6 +11,75 @@ Compile.prototype = {
         return this.getExpression(this.asts);
     },
 
+    getReferenceNameArray:function () {
+        this.references = {};
+        this.getRef(this.asts);
+        var ret = [];
+        for(var key in this.references){
+            if(this.references.hasOwnProperty(key)){
+                ret.push(key);
+            }
+        }
+        return ret;
+    },
+
+    getRef:function (ast) {
+        var exp = ast.expression;
+        var type = ast.type;
+        if (type === 'expression') {
+            switch (ast.operator) {
+                case '+':
+                case '-':
+                case '/':
+                case '%':
+                case '*':
+                case '||':
+                case '&&':
+                case '>':
+                case '<':
+                case '==':
+                case '>=':
+                case '<=':
+                case '!=':
+                    this.getRef(exp[0]);
+                    this.getRef(exp[1]);
+                    break;
+                case 'minus':
+                case 'not':
+                case 'parenthesis':
+                    this.getRef(exp[0]);
+                    break;
+                default:
+            }
+        } else {
+            if (type === 'references') {
+                if (this.references[ast.id] === undefined) {
+                    this.references[ast.id] = null;
+                }
+                if (ast.path !== undefined) {
+                    for (var i = 0; i < ast.path.length; i++) {
+                        var property = ast.path[i];
+                        if(property.type==='index'){
+                            var indexAst = property.id;
+                            if (indexAst.type === 'references') {
+                                this.getRef(indexAst);
+                            }
+                        } else if (property.type === 'method') {
+                            if (property.args !== undefined) {
+                                for (var argIndex = 0; argIndex < property.args.length; argIndex++) {
+                                    var arg = property.args[argIndex];
+                                    if(arg.type === 'references'){
+                                        this.getRef(arg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
     getExpression:function (ast) {
         var exp = ast.expression;
         var ret;
