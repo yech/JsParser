@@ -248,6 +248,18 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a.fn($a.b)")).evaluate({a:{a:1,b:2,fn:function(p1){return p1+1}},b:4})).toEqual(3);
             });
         });
+
+    });
+
+    describe("test references",function(){
+        it("test references",function(){
+            expect(new Compile(expression.parse("$a")).getReferenceNameArray()).toEqual(["a"]);
+            expect(new Compile(expression.parse("$a+$b")).getReferenceNameArray()).toEqual(["a","b"]);
+            expect(new Compile(expression.parse("$a[$c]+$b")).getReferenceNameArray()).toEqual(["a","c","b"]);
+            expect(new Compile(expression.parse("$a[$c]+$b[$d][$e]")).getReferenceNameArray()).toEqual(["a","c","b","d","e"]);
+            expect(new Compile(expression.parse("$a.c+$b")).getReferenceNameArray()).toEqual(["a","b"]);
+            expect(new Compile(expression.parse("$a.abc($c,$d)+$b")).getReferenceNameArray()).toEqual(["a","c","d","b"]);
+        });
     });
 
 });
