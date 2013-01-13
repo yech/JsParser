@@ -1,6 +1,7 @@
-var runParser = function() {
+var runParser = function () {
     var $out = $("#astsOut");
     var $evalOut = $("#evaluationOut");
+    var $refOut = $("#refOut");
     var printOut = function (str) {
         $out.html(str);
     };
@@ -13,12 +14,19 @@ var runParser = function() {
             var compile = new Compile(asts);
             var context = $.parseJSON($("#context").val());
 
-            $evalOut.removeClass("bad").addClass('good');
-            $evalOut.text(compile.evaluate(context));
+            $evalOut.removeClass("bad").addClass('good').text(compile.evaluate(context));
+            var refs = compile.getReferenceNameArray();
+            var refsText = '';
+            for (var i = 0; i < refs.length; i++) {
+                refsText += (refs[i] + ((i !== refs.length - 1) ? ',' : ''));
+            }
+            $refOut.removeClass("bad").addClass('good').text(refsText);
+
         }
     } catch (e) {
         $out.removeClass("good").addClass('bad');
         $evalOut.removeClass("good").addClass('bad');
+        $refOut.removeClass("good").addClass('bad');
         printOut(e.message || e);
     }
 };
