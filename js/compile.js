@@ -287,11 +287,7 @@ Compile.prototype = {
     getPropIndex:function (property, baseRef) {
         var ast = property.id;
         var key;
-        if (ast.type === 'references') {
-            key = this.getReferences(ast);
-        } else {
-            key = ast.value;
-        }
+        key = this.getExpression(ast);
 
         var ret;
         ret = baseRef[key];

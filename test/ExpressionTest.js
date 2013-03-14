@@ -233,6 +233,9 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a[0]+$a[1]")).evaluate({a:[1,3,5]})).toEqual(4);
                 expect(new Compile(expression.parse("$a['a']+$b['b']")).evaluate({a:{a:1,b:2},b:{a:1,b:2}})).toEqual(3);
                 expect(new Compile(expression.parse("$a[$b]")).evaluate({a:[1,3,6],b:2})).toEqual(6);
+                expect(new Compile(expression.parse("$a[$b]")).evaluate({a:[1,2,3],b:1})).toEqual(2);
+                console.log(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1}));
+                expect(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1})).toEqual(3);
 
             });
             it("test property",function(){
@@ -240,6 +243,8 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a.b")).evaluate({a:{a:1,b:2}})).toEqual(2);
                 expect(new Compile(expression.parse("$b.b")).evaluate({a:1,b:{e:2,b:3}})).toEqual(3);
                 expect(new Compile(expression.parse("$a.b.b")).evaluate({a:{a:1,b:{a:3,b:5}}})).toEqual(5);
+                expect(new Compile(expression.parse("$a.c")).evaluate({a:{a:1,b:{a:3,b:5}}})).toBeUndefined();
+                expect(new Compile(expression.parse("$a.c.d")).evaluate({a:{a:1,b:{a:3,b:5}}})).toBeUndefined();
             });
             it("test method",function(){
                 expect(new Compile(expression.parse("$a.fn()")).evaluate({a:{a:1,b:2,fn:function(){return this.a+this.b}}})).toEqual(3);

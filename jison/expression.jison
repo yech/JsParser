@@ -188,8 +188,6 @@ property
     ;
 
 index
-    : BRACKET literal CLOSE_BRACKET
-        { $$ = $2; }
-    | BRACKET references CLOSE_BRACKET
+    : BRACKET expression CLOSE_BRACKET
         { $$ = $2; }
     ;
