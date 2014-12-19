@@ -20,6 +20,9 @@ describe("test expression", function () {
             it("test string", function () {
                 expect(expression.parse("'abc'")).toEqual({type:"string", value:"abc"});
             });
+            it("test function call",function(){
+                console.log(expression.parse("$a.b().c()"));
+            })
         });
 
         describe("test math expression", function () {
@@ -236,6 +239,8 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a[$b]")).evaluate({a:[1,2,3],b:1})).toEqual(2);
                 console.log(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1}));
                 expect(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1})).toEqual(3);
+                //expect(new Compile(expression.parse("$a$b")).evaluate({a:1,b:2})).toEqual(1);
+                expect(new Compile(expression.parse("$a[b()]"),{b:function(){return 1;}}).evaluate({a:[1,2,3]})).toEqual(2);
 
             });
             it("test property",function(){
@@ -257,6 +262,15 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a.fn($a.b)")).evaluate({a:{a:1,b:2,fn:function(p1){return p1+1}},b:4})).toEqual(3);
                 expect(new Compile(expression.parse("$a+a(1)"),{a:function(p){return p+1}}).evaluate({a:4})).toEqual(6);
                 expect(new Compile(expression.parse("a(1)+b(1,2,$a+1,$b)"),{a:function(p){return p+1},b:function(p1,p2,p3,p4){return p1+p2+p3+p4;}}).evaluate({a:4,b:1})).toEqual(11);
+
+            });
+            it("test method 2",function(){
+                expect(new Compile(expression.parse("$a.fn().d")).evaluate({a:{a:1,b:2,fn:function(){return {d:1}  }}})).toEqual(1);
+                expect(new Compile(expression.parse("$a.fn().fn()")).evaluate({a:{a:1,b:2,fn:function(){return {d:1,fn:function(){return this.d+1;}}  }}})).toEqual(2);
+                expect(new Compile(expression.parse("a($c)"),{a:function(p){return p+1}}).evaluate({c:100})).toEqual(101);
+                expect(new Compile(expression.parse("a(b(1))"),{a:function(p){return p+1},b:function(p){return p+2;}}).evaluate({})).toEqual(4);
+                expect(new Compile(expression.parse("a(10,1+b(1))"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(6);
+                expect(new Compile(expression.parse("a(10,(b(1)-1)*5)"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(0);
             });
         });
 
