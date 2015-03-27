@@ -271,6 +271,10 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("a(b(1))"),{a:function(p){return p+1},b:function(p){return p+2;}}).evaluate({})).toEqual(4);
                 expect(new Compile(expression.parse("a(10,1+b(1))"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(6);
                 expect(new Compile(expression.parse("a(10,(b(1)-1)*5)"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(0);
+                expect(new Compile(expression.parse("a(b(1),3)"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(0);
+                expect(new Compile(expression.parse("a(3,b(1))"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({})).toEqual(0);
+                expect(new Compile(expression.parse("a(b($c),3)"),{a:function(p,q){return p-q},b:function(p){return p+2;}}).evaluate({c:1})).toEqual(0);
+                expect(new Compile(expression.parse("toFixed(sum($fieldTt),3)"),{toFixed:function(p,q){return p-q},sum:function(p){return p+2;}}).evaluate({fieldTt:1})).toEqual(0);
             });
         });
 
