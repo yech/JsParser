@@ -19,6 +19,7 @@ describe("test expression", function () {
 
             it("test string", function () {
                 expect(expression.parse("'abc'")).toEqual({type:"string", value:"abc"});
+                expect(expression.parse("\"abc\"")).toEqual({type:"string", value:"abc"});
             });
             it("test function call",function(){
                 console.log(expression.parse("$a.b().c()"));

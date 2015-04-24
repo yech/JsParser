@@ -23,7 +23,8 @@
 <INITIAL,p,func>"false"                               { return 'BOOL'; }
 <INITIAL,p,func>"true"                                { return 'BOOL'; }
 <INITIAL,b,p,func>"'"(\\\'|[^\'])*"'"                 { yytext = yytext.substr(1, yyleng-2).replace(/\\'/g,"'"); return 'STRING'; }
-<ref>"$"/[a-zA-Z_]                                   { return 'DOLLAR'; }
+<INITIAL,b,p,func>"\""(\\\"|[^\"])*"\""               { yytext = yytext.substr(1, yyleng-2).replace(/\\"/g,"\""); return 'STRING'; }
+<ref>"$"/[a-zA-Z_]                                    { return 'DOLLAR'; }
 <ref>[_a-zA-Z][a-zA-Z0-9_]*                           { return 'ID'; }
 <ref>"."                                              { return 'DOT'; }
 <ref,p,func>","[ ]*                                   { return 'COMMA'; }
