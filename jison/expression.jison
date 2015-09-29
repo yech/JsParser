@@ -2,11 +2,11 @@
 
 /* lexical grammar */
 %lex
-%x ref b p func
+%x ref b p func fb
 %%
 
 <INITIAL,b,p,func>[.]*?/"$"                           { this.begin("ref"); }
-<INITIAL,b,p,func>[a-zA-Z][a-zA-Z_]*?/"("             { this.begin("func"); return 'ID'; }
+<INITIAL,b,p,func>[a-zA-Z][a-zA-Z_]*?/"("             { this.begin("fb"); return 'ID'; }
 <INITIAL,b,p,func>\s+                                 /* skip whitespace */
 <INITIAL,b,p,func>[0-9]+("."[0-9]+)?\b                { return 'NUMBER'; }
 <INITIAL,ref,b,p,func>[%\+\-\*/]                      { return yytext; }
@@ -30,10 +30,12 @@
 <ref,p,func>","[ ]*                                   { return 'COMMA'; }
 <ref,b,p>"["                                          { this.begin("b"); return 'BRACKET'; }
 <b>"]"                                                { this.popState(); return 'CLOSE_BRACKET'; }
-<INITIAL,b,func>"("                                   { return 'PARENTHESIS'; }
+<fb>"("                                               { this.begin("func"); return 'PARENTHESIS'; }
+<INITIAL,b>"("                                        { return 'PARENTHESIS'; }
 <INITIAL,b>")"                                        { return 'CLOSE_PARENTHESIS'; }
-<ref,p>"("                                            { this.begin("p"); return 'PARENTHESIS'; }
-<p,func>")"                                           { this.popState(); return 'CLOSE_PARENTHESIS'; }
+<ref,p,func>"("                                       { this.begin("p"); return 'PARENTHESIS'; }
+<p>")"                                                { this.popState(); return 'CLOSE_PARENTHESIS'; }
+<func>")"                                             { this.popState(); this.popState(); return 'CLOSE_PARENTHESIS'; }
 <ref>\s+                                              { this.popState(); }
 <ref>/.                                               { this.popState(); }
 <ref,func><<EOF>>                                     { this.popState(); return 'EOF'; }

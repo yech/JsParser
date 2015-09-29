@@ -379,7 +379,7 @@ var YYSTATE=YY_START
 switch($avoiding_name_collisions) {
 case 0: this.begin("ref"); 
 break;
-case 1: this.begin("func"); return 33; 
+case 1: this.begin("fb"); return 33; 
 break;
 case 2:/* skip whitespace */
 break;
@@ -427,26 +427,30 @@ case 23: this.begin("b"); return 42;
 break;
 case 24: this.popState(); return 43; 
 break;
-case 25: return 24; 
+case 25: this.begin("func"); return 24; 
 break;
-case 26: return 25; 
+case 26: return 24; 
 break;
-case 27: this.begin("p"); return 24; 
+case 27: return 25; 
 break;
-case 28: this.popState(); return 25; 
+case 28: this.begin("p"); return 24; 
 break;
-case 29: this.popState(); 
+case 29: this.popState(); return 25; 
 break;
-case 30: this.popState(); 
+case 30: this.popState(); this.popState(); return 25; 
 break;
-case 31: this.popState(); return 5; 
+case 31: this.popState(); 
 break;
-case 32: return 5; 
+case 32: this.popState(); 
+break;
+case 33: this.popState(); return 5; 
+break;
+case 34: return 5; 
 break;
 }
 };
-lexer.rules = [/^(?:[.]*?(?=\$))/,/^(?:[a-zA-Z][a-zA-Z_]*?(?=\())/,/^(?:\s+)/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:[%\+\-\*/])/,/^(?:<=)/,/^(?:>=)/,/^(?:[><])/,/^(?:==)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:!=)/,/^(?:!)/,/^(?:=)/,/^(?:null\b)/,/^(?:false\b)/,/^(?:true\b)/,/^(?:'(\\'|[^\'])*')/,/^(?:"(\\"|[^\"])*")/,/^(?:\$(?=[a-zA-Z_]))/,/^(?:[_a-zA-Z][a-zA-Z0-9_]*)/,/^(?:\.)/,/^(?:,[ ]*)/,/^(?:\[)/,/^(?:\])/,/^(?:\()/,/^(?:\))/,/^(?:\()/,/^(?:\))/,/^(?:\s+)/,/^(?:(?=.))/,/^(?:$)/,/^(?:$)/];
-lexer.conditions = {"ref":{"rules":[4,19,20,21,22,23,27,29,30,31],"inclusive":false},"b":{"rules":[0,1,2,3,4,17,18,23,24,25,26],"inclusive":false},"p":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,27,28],"inclusive":false},"func":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,25,28,31],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,25,26,32],"inclusive":true}};
+lexer.rules = [/^(?:[.]*?(?=\$))/,/^(?:[a-zA-Z][a-zA-Z_]*?(?=\())/,/^(?:\s+)/,/^(?:[0-9]+(\.[0-9]+)?\b)/,/^(?:[%\+\-\*/])/,/^(?:<=)/,/^(?:>=)/,/^(?:[><])/,/^(?:==)/,/^(?:\|\|)/,/^(?:&&)/,/^(?:!=)/,/^(?:!)/,/^(?:=)/,/^(?:null\b)/,/^(?:false\b)/,/^(?:true\b)/,/^(?:'(\\'|[^\'])*')/,/^(?:"(\\"|[^\"])*")/,/^(?:\$(?=[a-zA-Z_]))/,/^(?:[_a-zA-Z][a-zA-Z0-9_]*)/,/^(?:\.)/,/^(?:,[ ]*)/,/^(?:\[)/,/^(?:\])/,/^(?:\()/,/^(?:\()/,/^(?:\))/,/^(?:\()/,/^(?:\))/,/^(?:\))/,/^(?:\s+)/,/^(?:(?=.))/,/^(?:$)/,/^(?:$)/];
+lexer.conditions = {"ref":{"rules":[4,19,20,21,22,23,28,31,32,33],"inclusive":false},"b":{"rules":[0,1,2,3,4,17,18,23,24,26,27],"inclusive":false},"p":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,23,28,29],"inclusive":false},"func":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,22,28,30,33],"inclusive":false},"fb":{"rules":[25],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,26,27,34],"inclusive":true}};
 return lexer;})()
 parser.lexer = lexer;
 function Parser () { this.yy = {}; }Parser.prototype = parser;parser.Parser = Parser;

@@ -147,6 +147,7 @@ describe("test expression", function () {
                     ], operator:"parenthesis"}
                 ], operator:"minus"});
             });
+
         });
 
     });
@@ -229,6 +230,12 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("-(2*(1+2))")).evaluate({})).toEqual(-6);
                 expect(new Compile(expression.parse("-(2*($a+$b))")).evaluate({a:1,b:2})).toEqual(-6);
             });
+
+            it("test function call parenthesis", function () {
+                expect(new Compile(expression.parse("f(2,($a+2))"),{f:function(p1,p2){return p1+p2},fa:function(p){return p+1}}).evaluate({a:1,b:2})).toEqual(5);
+                expect(new Compile(expression.parse("f(($a+2),2)"),{f:function(p1,p2){return p1+p2},fa:function(p){return p+1}}).evaluate({a:1,b:2})).toEqual(5);
+                expect(new Compile(expression.parse("f((($a+2)+2)*3,2,$b,($b||$f)||($b&&$f))"),{f:function(p1,p2,p3,p4){return p4?(p3?p1+p2:p1-p2):p1*p2},fa:function(p){return p+1}}).evaluate({a:1,b:true,f:false})).toEqual(17);
+            });
         });
 
         describe("test reference evaluate", function () {
@@ -238,7 +245,6 @@ describe("test expression", function () {
                 expect(new Compile(expression.parse("$a['a']+$b['b']")).evaluate({a:{a:1,b:2},b:{a:1,b:2}})).toEqual(3);
                 expect(new Compile(expression.parse("$a[$b]")).evaluate({a:[1,3,6],b:2})).toEqual(6);
                 expect(new Compile(expression.parse("$a[$b]")).evaluate({a:[1,2,3],b:1})).toEqual(2);
-                console.log(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1}));
                 expect(new Compile(expression.parse("$a[$b + 1]")).evaluate({a:[1,2,3],b:1})).toEqual(3);
                 //expect(new Compile(expression.parse("$a$b")).evaluate({a:1,b:2})).toEqual(1);
                 expect(new Compile(expression.parse("$a[b()]"),{b:function(){return 1;}}).evaluate({a:[1,2,3]})).toEqual(2);
